@@ -54,9 +54,25 @@ const Messenger = (() => {
     return Messenger;
 })();
 
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('domcontentloaded');
-});
+
+// console.log(chrome);
+
+// window.addEventListener('DOMContentLoaded', () => {
+//     console.log('domcontentloaded');
+//     console.log(document);
+// });
+
+function injectScript(parent, path) {
+    const e = document.createElement('script');
+    if (typeof 'chrome' !== 'undefined') {
+        e.setAttribute('src', chrome.extension.getURL(path));
+    } else if (typeof 'browser' !== 'undefined') {
+        e.setAttribute('src', browser.runtime.getURL(path));
+    }
+    parent.appendChild(e);
+}
+
+injectScript(document.documentElement, '/google_search_blocker.user.js');
 
 const m = new Messenger('shosato.jp', 'content');
 m.onmessage = function (data) {

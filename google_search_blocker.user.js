@@ -24,10 +24,6 @@
 // @run-at       document-start
 // @noframes
 // ==/UserScript==
-console.log(document.body);
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('domcontentloaded');
-});
 
 var CODE;
 (async function code() {
@@ -189,7 +185,6 @@ var CODE;
                         method: 'getURL',
                         args: [resources_map[key]],
                     });
-                    console.log(res);
                     this.resources[key] = await (await fetch(res.result)).text();
                 }
             }
@@ -213,14 +208,7 @@ var CODE;
     })();
 
     if (!ExtensionIO.isTampermonkey) {
-        // chrome.runtime.sendMessage({
-        //     method: 'initSync'
-        // }, e => {
-        //     console.log(e);
-        // });
-        const s = Date.now();
         await ExtensionIO.loadResources(ExtensionIO.resources_map);
-        console.log(Date.now() - s);
         await ExtensionIO.getValuesOnInit();
     }
 
@@ -415,8 +403,8 @@ var CODE;
                     // }).catch(rej);
                     const script = document.createElement('script');
                     script.setAttribute('src', 'https://apis.google.com/js/api.js');
-                    document.body.appendChild(script);
                     script.addEventListener('load', () => {
+                        console.log('gapi', gapi);
                         gapi.load("client:auth2", async function () {
                             gapi.auth2.init({
                                 client_id: CLIENT_ID
@@ -429,8 +417,10 @@ var CODE;
                         });
                     });
                     script.addEventListener('error', function () {
+                        console.log('rejected');
                         rej();
                     });
+                    window.document.body.appendChild(script);
                 } else {
                     self.signIn().then(res, rej);
                 }
@@ -1543,11 +1533,7 @@ var CODE;
             }
         }
 
-        if (document.body) {
-            onDOMContentLoaded();
-        } else {
-            document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
-        }
+        document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
         window.addEventListener('load', function () {
             console.log('%c----------------load----------------', `color:${Colors.LightGreen};`);
